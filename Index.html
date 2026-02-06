@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My baby shortcake</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .heart-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .pulse-heart {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .glow-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .glow-card:hover {
+            border-color: #ec4899;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+        }
+
+        .unlock-animation {
+            animation: unlock 0.6s ease-out;
+        }
+
+        @keyframes unlock {
+            0% { transform: rotateY(90deg) rotateX(45deg); opacity: 0; }
+            100% { transform: rotateY(0) rotateX(0); opacity: 1; }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+        }
+
+        .music-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .music-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
+        }
+
+        .music-toggle-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .lock-badge {
+            display: inline-block;
+            background: rgba(236, 72, 153, 0.2);
+            color: #ec4899;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .unlock-badge {
+            display: inline-block;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .floating-hearts {
+            position: fixed;
+            pointer-events: none;
+        }
+
+        .heart-float {
+            animation: heartFloat 3s ease-out forwards;
+        }
+
+        @keyframes heartFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) translateX(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) translateX(var(--drift)) scale(1.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hidden Audio Elements - Available on all pages -->
+    <audio id="backgroundMusic" loop preload="auto">
+        <source src="DAISIES.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="proposeMusic" preload="auto">
+        <source src="Elvis_Presley_-_Can_t_Help_Falling_in_Love.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Quiz questions for each day
+        const quizData = {
+            1: [
+                { question: "What's one thing about me you love most?", type: "text" },
+                { question: "What's a moment that made you fall for me?", type: "text" }
+            ],
+            2: [
+                { question: "If you could give me one promise today, what would it be?", type: "text" },
+                { question: "What's one thing you want me to change?", type: "text" }
+            ],
+            3: [
+                { question: "What's your favorite memory with me?", type: "text" },
+                { question: "What made that moment special?", type: "text" }
+            ],
+            4: [
+                { question: "How do I make you feel loved?", type: "text" },
+                { question: "What's one thing I do that always makes you smile?", type: "text" }
+            ],
+            5: [
+                { question: "What's something new you want us to try together? (Camping, Sky diving,...)", type: "text" },
+                { question: "Where would you love to go with me?", type: "text" }
+            ],
+            6: [
+                { question: "What's the sweetest thing I've ever done for you?", type: "text" },
+                { question: "How do you want me to show my love?", type: "text" }
+            ],
+            7: [
+                { question: "What's one thing you want me to know?", type: "text" },
+                { question: "What makes our love special? (Has to be our bear necessities right?)", type: "text" }
+            ],
+            8: [
+                { question: "If I could be anything to you, what would you want me to be? (P.S Batman)", type: "text" },
+                { question: "What's something you want me to do more of?", type: "text" }
+            ]
+        };
+
+        // Surprise data for each day
+        const surprises = [
+            { 
+                day: 1, 
+                date: "Feb 7", 
+                title: "Rose Day", 
+                emoji: "🌹", 
+                description: "Like this rose, my love for you blooms endlessly. Each petal represents a reason I love you.",
+                color: "from-red-100 to-pink-100",
+                border: "border-red-300"
+            },
+            { 
+                day: 2, 
+                date: "Feb 8", 
+                title: "Propose Day", 
+                emoji: "💍", 
+                description: "You are my forever. Will you continue being mine? Every day with you is a yes to forever.",
+                color: "from-purple-100 to-pink-100",
+                border: "border-purple-300"
+            },
+            { 
+                day: 3, 
+                date: "Feb 9", 
+                title: "Chocolate Day", 
+                emoji: "🍫", 
+                description: "Life with you is sweeter than any chocolate. You're my sweetest addiction.",
+                color: "from-amber-100 to-orange-100",
+                border: "border-amber-400"
+            },
+            { 
+                day: 4, 
+                date: "Feb 10", 
+                title: "Teddy Day", 
+                emoji: "🧸", 
+                description: "Just like a teddy bear, you bring me comfort and warmth. I want to hold you close forever.",
+                color: "from-yellow-100 to-amber-100",
+                border: "border-yellow-400"
+            },
+            { 
+                day: 5, 
+                date: "Feb 11", 
+                title: "Promise Day", 
+                emoji: "🤝", 
+                description: "I promise to love you through every season, to be your safe space, and to choose you every single day.",
+                color: "from-blue-100 to-cyan-100",
+                border: "border-blue-300"
+            },
+            { 
+                day: 6, 
+                date: "Feb 12", 
+                title: "Hug Day", 
+                emoji: "🤗", 
+                description: "In your arms is my favorite place. A hug from you makes everything better.",
+                color: "from-green-100 to-emerald-100",
+                border: "border-green-300"
+            },
+            { 
+                day: 7, 
+                date: "Feb 13", 
+                title: "Kiss Day", 
+                emoji: "💋", 
+                description: "Every kiss with you feels like the first. You make my heart skip with just one touch.",
+                color: "from-pink-100 to-rose-100",
+                border: "border-pink-400"
+            },
+            { 
+                day: 8, 
+                date: "Feb 14", 
+                title: "Valentine's Day", 
+                emoji: "❤️", 
+                description: "You are my Valentine today and every day. Thank you for being my everything. I love you infinitely.",
+                color: "from-red-100 to-pink-200",
+                border: "border-red-400"
+            }
+        ];
+
+        // Background Music Player Component - Global (shows on all pages)
+        function MusicPlayer() {
+            const [isPlaying, setIsPlaying] = useState(false);
+            const audioRef = React.useRef(null);
+
+            useEffect(() => {
+                audioRef.current = document.getElementById('backgroundMusic');
+                
+                // Set volume to 70%
+                if (audioRef.current) {
+                    audioRef.current.volume = 0.7;
+                    
+                    // Auto-play music when component mounts
+                    const playPromise = audioRef.current.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise
+                            .then(() => {
+                                setIsPlaying(true);
+                                console.log('Music started playing automatically');
+                            })
+                            .catch((error) => {
+                                console.log('Auto-play prevented. User needs to interact with page first.', error);
+                                // Try again after a small delay
+                                setTimeout(() => {
+                                    audioRef.current.play()
+                                        .then(() => setIsPlaying(true))
+                                        .catch(() => console.log('Still blocked - user must click play button'));
+                                }, 500);
+                            });
+                    }
+                }
+            }, []);
+
+            const toggleMusic = () => {
+                if (audioRef.current) {
+                    if (isPlaying) {
+                        audioRef.current.pause();
+                        setIsPlaying(false);
+                    } else {
+                        audioRef.current.play()
+                            .then(() => {
+                                setIsPlaying(true);
+                            })
+                            .catch((error) => {
+                                console.error('Error playing audio:', error);
+                                alert('Unable to play music. Please check if the MP3 files are in the same folder as the HTML file.');
+                            });
+                    }
+                }
+            };
+
+            return (
+                <div className="music-player">
+                    <button 
+                        onClick={toggleMusic}
+                        className="music-toggle-btn"
+                        title={isPlaying ? "Pause Music" : "Play Music"}
+                    >
+                        {isPlaying ? (
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="6" y="4" width="4" height="16" rx="1"/>
+                                <rect x="14" y="4" width="4" height="16" rx="1"/>
+                            </svg>
+                        ) : (
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        )}
+                    </button>
+                </div>
+            );
+        }
+
+        // Opening Screen Component
+        function OpeningScreen({ onComplete }) {
+            const [step, setStep] = useState(1);
+            const [hisName, setHisName] = useState("");
+            const [herName, setHerName] = useState("");
+
+            // Try to play music on any user interaction
+            useEffect(() => {
+                const tryPlayMusic = () => {
+                    const audio = document.getElementById('backgroundMusic');
+                    if (audio && audio.paused) {
+                        audio.play().catch(() => {});
+                    }
+                };
+
+                document.addEventListener('click', tryPlayMusic, { once: true });
+                document.addEventListener('touchstart', tryPlayMusic, { once: true });
+
+                return () => {
+                    document.removeEventListener('click', tryPlayMusic);
+                    document.removeEventListener('touchstart', tryPlayMusic);
+                };
+            }, []);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (step === 1 && hisName.trim()) {
+                    setStep(2);
+                } else if (step === 2 && herName.trim()) {
+                    const data = { hisName, herName };
+                    localStorage.setItem('loveQuest_names', JSON.stringify(data));
+                    onComplete(data);
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex items-center justify-center p-6">
+                    {/* Music Player */}
+                    <MusicPlayer />
+                    
+                    <div className="bg-white rounded-3xl shadow-2xl p-12 max-w-md w-full text-center slide-in">
+                        <div className="text-7xl mb-6 heart-animation">💝</div>
+                        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-600 mb-4">
+                            Hiii my Brown Sugar Shortcake 
+                        </h1>
+                        <p className="text-gray-600 mb-8">It's Valentine's Week!</p>
+                        <p className="text-gray-500 text-sm mb-8">A week of surprises, memories, and moments we'll cherish. 🎵✨</p>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {step === 1 ? (
+                                <>
+                                    <div>
+                                        <label className="block text-gray-700 font-semibold mb-2 text-left">
+                                            Who's your Autistic & funny boyfriend? 😜
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={hisName}
+                                            onChange={(e) => setHisName(e.target.value)}
+                                            placeholder="Enter your name"
+                                            className="w-full px-4 py-3 border-2 border-pink-200 rounded-lg focus:outline-none focus:border-pink-500 transition-colors"
+                                            required
+                                        />
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        className="w-full btn-primary text-white font-bold py-3 rounded-lg"
+                                    >
+                                        Next →
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <div>
+                                        <label className="block text-gray-700 font-semibold mb-2 text-left">
+                                            My Queen's Name? 👸
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={herName}
+                                            onChange={(e) => setHerName(e.target.value)}
+                                            placeholder="Enter her name"
+                                            className="w-full px-4 py-3 border-2 border-pink-200 rounded-lg focus:outline-none focus:border-pink-500 transition-colors"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setStep(1)}
+                                            className="flex-1 btn-secondary text-white font-bold py-3 rounded-lg"
+                                        >
+                                            ← Back
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="flex-1 btn-primary text-white font-bold py-3 rounded-lg"
+                                        >
+                                            Start Quest 💕
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        // Quiz Modal Component
+        function DayQuizModal({ dayNum, surprise, onClose, onComplete }) {
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [answers, setAnswers] = useState([]);
+            const [currentAnswer, setCurrentAnswer] = useState("");
+            const questions = quizData[dayNum] || [];
+
+            useEffect(() => {
+                // Play Elvis Presley song on Feb 8 (Propose Day)
+                if (dayNum === 2) {
+                    const proposeMusic = document.getElementById('proposeMusic');
+                    if (proposeMusic) {
+                        proposeMusic.volume = 0.7;
+                        proposeMusic.play();
+                    }
+                }
+
+                return () => {
+                    // Stop the propose music when modal closes
+                    if (dayNum === 2) {
+                        const proposeMusic = document.getElementById('proposeMusic');
+                        if (proposeMusic) {
+                            proposeMusic.pause();
+                            proposeMusic.currentTime = 0;
+                        }
+                    }
+                };
+            }, [dayNum]);
+
+            const handleNext = () => {
+                if (currentAnswer.trim()) {
+                    const newAnswers = [...answers, currentAnswer];
+                    setAnswers(newAnswers);
+                    
+                    if (currentQuestion < questions.length - 1) {
+                        setCurrentQuestion(currentQuestion + 1);
+                        setCurrentAnswer("");
+                    } else {
+                        localStorage.setItem(`loveQuest_answers_${dayNum}`, JSON.stringify(newAnswers));
+                        
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            colors: ['#ec4899', '#f472b6', '#fbcfe8', '#fce7f3']
+                        });
+
+                        setTimeout(() => {
+                            onComplete();
+                            onClose();
+                        }, 500);
+                    }
+                }
+            };
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal-content fade-in" onClick={(e) => e.stopPropagation()}>
+                        <div className="text-center mb-6">
+                            <div className="text-6xl mb-4">{surprise.emoji}</div>
+                            <h2 className="text-3xl font-bold text-gray-800 mb-2">{surprise.title}</h2>
+                            <p className="text-pink-600 font-semibold">Question {currentQuestion + 1} of {questions.length}</p>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-gray-700 font-semibold mb-3 text-lg">
+                                {questions[currentQuestion]?.question}
+                            </label>
+                            <textarea
+                                value={currentAnswer}
+                                onChange={(e) => setCurrentAnswer(e.target.value)}
+                                className="w-full px-4 py-3 border-2 border-pink-200 rounded-lg focus:outline-none focus:border-pink-500 transition-colors resize-none"
+                                rows="4"
+                                placeholder="Type your answer here..."
+                            />
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={onClose}
+                                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleNext}
+                                disabled={!currentAnswer.trim()}
+                                className="flex-1 btn-primary text-white font-bold py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {currentQuestion < questions.length - 1 ? "Next →" : "Complete ✓"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Helper function to check if a day should be unlocked based on current date
+        function isDateUnlocked(day) {
+            const today = new Date();
+            const unlockDate = new Date(2026, 1, 6 + day); // Feb = month 1 (0-indexed), day 7 = 6+1
+            return today >= unlockDate;
+        }
+
+        // Surprise Card Component
+        function SurpriseCard({ surprise, index }) {
+            const [isFlipped, setIsFlipped] = useState(false);
+            const [showQuiz, setShowQuiz] = useState(false);
+            const [isUnlocked, setIsUnlocked] = useState(false);
+
+            useEffect(() => {
+                const unlockedDays = JSON.parse(localStorage.getItem('loveQuest_unlocked') || '[]');
+                setIsUnlocked(unlockedDays.includes(surprise.day));
+            }, [surprise.day]);
+
+            const handleUnlock = () => {
+                if (!isUnlocked) {
+                    const unlockedDays = JSON.parse(localStorage.getItem('loveQuest_unlocked') || '[]');
+                    unlockedDays.push(surprise.day);
+                    localStorage.setItem('loveQuest_unlocked', JSON.stringify(unlockedDays));
+                    setIsUnlocked(true);
+
+                    confetti({
+                        particleCount: 50,
+                        spread: 60,
+                        origin: { y: 0.6 },
+                        colors: ['#ec4899', '#f472b6', '#fbcfe8']
+                    });
+                }
+                setShowQuiz(true);
+            };
+
+            const handleQuizComplete = () => {
+                setIsFlipped(true);
+            };
+
+            const canUnlock = isDateUnlocked(surprise.day);
+
+            return (
+                <>
+                    <div
+                        onClick={() => {
+                            if (canUnlock) {
+                                if (!isUnlocked) handleUnlock();
+                                else setShowQuiz(true);
+                            }
+                        }}
+                        className={`cursor-pointer h-72 perspective ${canUnlock ? '' : 'opacity-60'}`}
+                    >
+                        <div
+                            className={`relative w-full h-full transition-transform duration-500`}
+                            style={{
+                                transformStyle: "preserve-3d",
+                                transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)"
+                            }}
+                        >
+                            {/* Front */}
+                            <div
+                                className={`absolute w-full h-full bg-gradient-to-br ${surprise.color} ${surprise.border} border-2 rounded-2xl p-6 flex flex-col items-center justify-center shadow-xl glow-card ${
+                                    isUnlocked ? "unlock-animation" : ""
+                                }`}
+                                style={{ backfaceVisibility: "hidden" }}
+                            >
+                                {isUnlocked ? (
+                                    <>
+                                        <div className="text-6xl mb-4 heart-animation">{surprise.emoji}</div>
+                                        <h3 className="text-2xl font-bold text-center text-gray-800 mb-2">
+                                            {surprise.title}
+                                        </h3>
+                                        <p className="text-sm text-gray-600 text-center">Click to answer & reveal →</p>
+                                        <div className="unlock-badge">UNLOCKED ✓</div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-6xl mb-4 pulse-heart">🔒</div>
+                                        <p className="text-center font-semibold text-gray-800 mb-2">{surprise.date}</p>
+                                        <p className="text-center text-sm text-gray-600">
+                                            {canUnlock ? "Click to unlock" : "Coming soon..."}
+                                        </p>
+                                        {!canUnlock && <div className="lock-badge">LOCKED</div>}
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Back */}
+                            <div
+                                className="absolute w-full h-full bg-white rounded-2xl p-6 shadow-xl border-2 border-pink-200 flex flex-col justify-center"
+                                style={{
+                                    backfaceVisibility: "hidden",
+                                    transform: "rotateY(180deg)"
+                                }}
+                            >
+                                <div className="text-center">
+                                    <div className="text-5xl mb-4">{surprise.emoji}</div>
+                                    <h3 className="text-xl font-bold text-gray-800 mb-4">{surprise.title}</h3>
+                                    <p className="text-gray-600 leading-relaxed">{surprise.description}</p>
+                                    <p className="text-sm text-pink-600 mt-4 font-semibold">← Click to close</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {showQuiz && (
+                        <DayQuizModal
+                            dayNum={surprise.day}
+                            surprise={surprise}
+                            onClose={() => setShowQuiz(false)}
+                            onComplete={handleQuizComplete}
+                        />
+                    )}
+                </>
+            );
+        }
+
+        // Main Surprises Screen
+        function SurpriseScreen({ nameData }) {
+            const [unlockedCount, setUnlockedCount] = useState(0);
+
+            useEffect(() => {
+                const checkUnlocked = () => {
+                    const unlockedDays = JSON.parse(localStorage.getItem('loveQuest_unlocked') || '[]');
+                    setUnlockedCount(unlockedDays.length);
+                };
+                checkUnlocked();
+                const interval = setInterval(checkUnlocked, 1000);
+                return () => clearInterval(interval);
+            }, []);
+
+            return (
+                <div className="min-h-screen p-6 pb-20">
+                    {/* Music Player */}
+                    <MusicPlayer />
+
+                    {/* Reset Button */}
+                    <button
+                        onClick={() => {
+                            if (confirm('Are you sure you want to restart? This will clear all progress and answers.')) {
+                                localStorage.clear();
+                                window.location.reload();
+                            }
+                        }}
+                        className="fixed top-6 right-6 bg-white hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 rounded-lg shadow-md border-2 border-gray-200 transition-all z-50"
+                        title="Reset and go back to landing page"
+                    >
+                        🔄 Reset
+                    </button>
+
+                    {/* Header */}
+                    <div className="text-center mb-12 fade-in">
+                        <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-600 mb-2 text-shadow">
+                            Hey {nameData?.herName || 'Beautiful'}! 💖
+                        </h1>
+                        <p className="text-gray-600 text-lg">
+                            This is our Valentine's Week. Click each day to answer questions and unlock your surprises from {nameData?.hisName || 'me'} ❤️
+                        </p>
+                        <div className="mt-4 inline-block bg-gradient-to-r from-pink-100 to-rose-100 rounded-lg px-6 py-2 border-2 border-pink-300">
+                            <p className="font-bold text-pink-700">
+                                ✨ {unlockedCount} of 8 Surprises Unlocked ✨
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Calendar-like Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-12">
+                        {surprises.map((surprise, idx) => (
+                            <div key={idx} className="fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
+                                <SurpriseCard surprise={surprise} index={idx} />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Info Box */}
+                    <div className="max-w-4xl mx-auto bg-white rounded-2xl p-8 shadow-lg border-2 border-pink-200">
+                        <h3 className="text-2xl font-bold text-gray-800 mb-4">💝 How This Works</h3>
+                        <ul className="space-y-3 text-gray-700">
+                            <li className="flex items-start gap-3">
+                                <span className="text-pink-600 font-bold text-xl">1</span>
+                                <span>Each day from Feb 7-14, one surprise card will unlock automatically based on today's date</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <span className="text-pink-600 font-bold text-xl">2</span>
+                                <span>Click the unlocked card to answer 2 heartfelt questions just for that day</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <span className="text-pink-600 font-bold text-xl">3</span>
+                                <span>After answering, flip the card to see your special surprise for that day</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <span className="text-pink-600 font-bold text-xl">4</span>
+                                <span>Please remember to take a screenshot of the answers since i'm not that code smart 😅 and give your boyfriend a phone call to ask him about something special surprise for the day.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="text-center text-gray-600 text-sm mt-12">
+                        <p>Made with 💕 from your {nameData?.hisName || 'boyfriend'} • Happy Valentine's Week 2026 ❤️</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            const [page, setPage] = useState("opening");
+            const [nameData, setNameData] = useState(null);
+
+            useEffect(() => {
+                const saved = localStorage.getItem('loveQuest_names');
+                if (saved) {
+                    setNameData(JSON.parse(saved));
+                    setPage("surprises");
+                }
+            }, []);
+
+            const handleOpeningComplete = (data) => {
+                setNameData(data);
+                setPage("surprises");
+            };
+
+            return (
+                <div className="bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 min-h-screen">
+                    {page === "opening" ? (
+                        <OpeningScreen onComplete={handleOpeningComplete} />
+                    ) : (
+                        <SurpriseScreen nameData={nameData} />
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
